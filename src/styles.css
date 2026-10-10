@@ -1,2 +1,32 @@
 /* You can add global styles to this file, and also import other style files */
 @import 'tailwindcss';
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: #0b1114;
+}
+* {
+  box-sizing: border-box;
+}
+::selection {
+  background: #b5efdb;
+  color: #13201a;
+}
+.motion-paused *,
+.motion-paused *::before,
+.motion-paused *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

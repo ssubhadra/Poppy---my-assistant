@@ -1,0 +1,192 @@
+.shared-space {
+  max-width: 1440px;
+  margin: 34px auto;
+  display: grid;
+  grid-template-columns: minmax(260px, 0.85fr) minmax(0, 1.35fr);
+  gap: clamp(24px, 5vw, 80px);
+  height: clamp(610px, calc(100dvh - 240px), 950px);
+}
+.identity {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  padding: 25px 0 5px;
+}
+.identity-copy .eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: #bed1c6;
+}
+.identity h1 {
+  font-size: clamp(58px, 5.6vw, 88px);
+  line-height: 1.04;
+  font-weight: 400;
+  letter-spacing: -0.065em;
+  margin: 25px 0 22px -3px;
+}
+.identity h1 em {
+  font-weight: 350;
+  font-style: normal;
+  color: var(--mint);
+}
+.identity-description {
+  max-width: 340px;
+  font-size: 13px;
+  line-height: 1.95;
+  color: var(--muted);
+}
+.presence-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  min-height: 0;
+}
+.poppy-presence {
+  width: clamp(210px, 22vw, 335px);
+  transition: transform 1200ms ease;
+}
+.in-conversation .poppy-presence {
+  transform: scale(0.93);
+}
+.presence-caption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 13px;
+  padding: 0 0 12px;
+}
+.presence-name {
+  font: 9px var(--mono);
+  letter-spacing: 1.4px;
+  color: var(--mint);
+}
+.presence-name > span {
+  font-size: 8px;
+  color: #96ada4;
+  margin-left: 6px;
+}
+.presence-status {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #b7cebe;
+  font: 8px var(--mono);
+}
+.thinking-dot {
+  background: var(--acid);
+}
+@media (max-height: 860px) and (min-width: 761px) {
+  .shared-space {
+    height: max(590px, calc(100dvh - 228px));
+    margin-block: 28px;
+  }
+  .identity {
+    padding-top: 15px;
+  }
+  .poppy-presence {
+    width: 230px;
+  }
+  .identity h1 {
+    font-size: 66px;
+  }
+}
+@media (max-width: 1050px) {
+  .shared-space {
+    gap: 28px;
+    grid-template-columns: minmax(240px, 0.8fr) minmax(0, 1.3fr);
+  }
+  .identity h1 {
+    font-size: 59px;
+  }
+  .identity-description {
+    font-size: 12px;
+  }
+}
+@media (max-width: 760px) {
+  .shared-space {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    height: auto;
+    margin: 22px auto;
+  }
+  .identity {
+    position: relative;
+    padding: 0;
+    flex-shrink: 0;
+    min-height: 170px;
+    justify-content: center;
+  }
+  .identity-copy {
+    position: relative;
+    z-index: 1;
+    padding-right: 120px;
+  }
+  .identity h1 {
+    font-size: 43px;
+    margin: 15px 0 10px;
+  }
+  .identity-description {
+    font-size: 11px;
+    line-height: 1.7;
+    max-width: 220px;
+  }
+  .identity .eyebrow {
+    font-size: 7px;
+    letter-spacing: 1px;
+    gap: 7px;
+  }
+  .presence-stage {
+    position: absolute;
+    right: -11px;
+    top: 3px;
+    width: 144px;
+  }
+  .poppy-presence {
+    width: 144px;
+  }
+  .presence-caption {
+    gap: 7px;
+    padding: 0;
+  }
+  .presence-name {
+    font-size: 8px;
+  }
+  .presence-name > span {
+    display: none;
+  }
+  .presence-status {
+    font-size: 6px;
+    gap: 4px;
+    white-space: nowrap;
+  }
+  .presence-status .status-dot {
+    width: 3px;
+    height: 3px;
+  }
+}
+@media (max-width: 380px) {
+  .identity-copy {
+    padding-right: 92px;
+  }
+  .identity h1 {
+    font-size: 37px;
+  }
+  .presence-stage {
+    width: 122px;
+    right: -15px;
+    top: 11px;
+  }
+  .poppy-presence {
+    width: 122px;
+  }
+  .identity-description {
+    font-size: 10px;
+  }
+  .presence-status {
+    font-size: 5px;
+  }
+}

@@ -1,164 +1,301 @@
-import { CommonModule } from '@angular/common';
-import { AfterViewChecked, ChangeDetectionStrategy, Component, ElementRef, OnDestroy, ViewChild, computed, effect, inject, signal } from '@angular/core';
+import { CommonModule, DOCUMENT } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  OnDestroy,
+  ViewChild,
+  afterNextRender,
+  afterRenderEffect,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChatMessage } from '../interfaces/message';
 import { ChatService } from '../services/chat/chat.service';
+import { Presence } from './presence';
 
 @Component({
   selector: 'app-chat',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, Presence],
   templateUrl: './chat.html',
-  styleUrl: './chat.css',
+  styleUrls: ['./chat.css', './identity.css', './conversation.css', './choreography.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Chat implements AfterViewChecked, OnDestroy {
+export class Chat implements OnDestroy {
   @ViewChild('chatContainer') private chatContainer?: ElementRef<HTMLElement>;
-  readonly history = signal<ChatMessage[]>([
-    {
-      id: 1,
-      from: 'assistant',
-      modelName: 'Poppy',
-      text: `Oh, hello there! I was wondering when you’d finally step up to the desk. I’m Poppy, Subhadra's executive assistant, and I am absolutely thrilled you're here!
-
-Look, I know standard corporate procedure dictates I tell you that I'm an AI system here to query database fields, fetch documentation records, and optimize your information retrieval. But let's be entirely honest... you didn't wander into Subhadra's private world just to look at dry data cells, did you?
-
-You're here because you're curious about the brilliant mind pulling the strings behind the scenes.
-
-Consider me your ultimate insider guide. So tell me... where are we diving in first? Are you curious about her active projects, or do you want a glimpse into her personal interests?`,
-      timestamp: new Date(),
-      animate: false,
-    },
-  ]);
+  @ViewChild('messageInput') private messageInput?: ElementRef<HTMLInputElement>;
+  readonly introTitle = "Hey. You're here.";
+  readonly introBody =
+    "I'm Poppy. Subhadra's assistant, and your company here.\n\nAsk about her work, what she's into, or whatever brought you here. We can let the conversation find its own way.";
+  readonly introText = this.introTitle + '\n' + this.introBody;
+  readonly introPhase = signal<'arriving' | 'typing' | 'receding' | 'ready'>('arriving');
+  readonly introTyped = signal('');
+  readonly introTitleVisible = computed(() => this.introTyped().slice(0, this.introTitle.length));
+  readonly introBodyVisible = computed(() => this.introTyped().slice(this.introTitle.length + 1));
+  readonly composerReady = computed(() => this.introPhase() === 'ready');
+  readonly history = signal<ChatMessage[]>([]);
   readonly loading = signal(false);
   readonly message = signal('');
   readonly error = signal('');
-  readonly suggestionsVisible = signal(false);
-  readonly suggestionsDismissed = signal(false);
-  readonly completedRounds = signal(0);
-  readonly coffeeQueueNumber = signal<number | null>(null);
-  readonly maxRounds = 4;
-  readonly suggestedQuestions = [
-    'Who is Subhadra beyond her resume?',
-    'What does Subhadra enjoy reading and watching?',
-    'What has Subhadra worked on professionally?',
-  ];
-  readonly reachedLimit = computed(() => this.completedRounds() >= this.maxRounds);
+  readonly failedMessage = signal('');
+  readonly replyArriving = signal(false);
+  readonly typingReplyId = signal<number | null>(null);
+  readonly replyVisibleText = signal('');
+  readonly announcement = signal('');
+  readonly motionPaused = signal(false);
+  readonly reducedMotion = signal(false);
+  readonly motionEnabled = computed(() => !this.motionPaused() && !this.reducedMotion());
   readonly hasStarted = computed(() => this.history().some((item) => item.from === 'user'));
-  readonly suggestionsCloaked = computed(
-    () => !this.suggestionsVisible() || this.suggestionsDismissed() || this.hasStarted(),
-  );
+  readonly responding = computed(() => this.loading() || this.typingReplyId() !== null);
   readonly canSend = computed(
-    () => this.message().trim().length > 0 && !this.loading() && !this.reachedLimit(),
+    () => this.composerReady() && this.message().trim().length > 0 && !this.responding(),
   );
-  private nextId = 2;
-  private shouldScroll = false;
-  private scrollBehavior: ScrollBehavior = 'smooth';
-  private suggestionRevealTimer?: ReturnType<typeof setTimeout>;
-  private introRevealTimer?: ReturnType<typeof setTimeout>;
-  private chatservice = inject(ChatService);
+  readonly status = computed(() =>
+    !this.composerReady()
+      ? 'A little hello'
+      : this.loading()
+        ? 'Thinking it through'
+        : this.typingReplyId() !== null
+          ? 'Replying to you'
+          : this.replyArriving()
+            ? 'A thought, for you'
+            : 'Right here with you',
+  );
+  readonly topics = [
+    {
+      number: '01',
+      title: 'The things I make',
+      question: 'What has Subhadra worked on professionally?',
+    },
+    {
+      number: '02',
+      title: 'The things I love',
+      question: "What are Subhadra's personal interests and hobbies?",
+    },
+    {
+      number: '03',
+      title: 'What inspires me',
+      question: 'What does Subhadra enjoy reading and watching?',
+    },
+  ];
+  private readonly chatService = inject(ChatService);
+  private readonly document = inject(DOCUMENT);
+  private nextId = 1;
+  private followLatest = true;
+  private focusComposer = false;
+  private initialized = false;
+  private introTimer?: ReturnType<typeof setTimeout>;
+  private typingTimer?: ReturnType<typeof setTimeout>;
+  private replyTimer?: ReturnType<typeof setTimeout>;
+  private finishTyping?: () => void;
+  private motionQuery?: MediaQueryList;
+  private destroyed = false;
+  private readonly onMotionChange = (event: MediaQueryListEvent) =>
+    this.reducedMotion.set(event.matches);
 
   constructor() {
-    effect(() => {
-      if (typeof document !== 'undefined') document.title = "Poppy | Subhadra's Portfolio";
+    afterRenderEffect(() => {
       this.history();
       this.loading();
-      this.shouldScroll = true;
+      this.replyVisibleText();
+      this.composerReady();
+      this.updateRenderedView();
     });
-
-    if (typeof document !== 'undefined') {
-      this.introRevealTimer = setTimeout(() => {
-        this.history.update((items) =>
-          items.map((item) => (item.id === 1 ? { ...item, animate: true } : item)),
-        );
-      }, 80);
-      this.suggestionRevealTimer = setTimeout(() => {
-        if (!this.suggestionsDismissed()) this.suggestionsVisible.set(true);
-      }, 700);
-    }
+    effect(() => {
+      if (!this.motionEnabled() && this.initialized) {
+        this.skipIntro();
+        this.finishTyping?.();
+      }
+    });
+    // Start only after hydration, keeping server and client markup identical.
+    afterNextRender(() => {
+      this.initialized = true;
+      this.document.title = 'Subhadra, as I am — with Poppy';
+      this.motionQuery = this.document.defaultView?.matchMedia?.(
+        '(prefers-reduced-motion: reduce)',
+      );
+      this.reducedMotion.set(this.motionQuery?.matches ?? false);
+      this.motionQuery?.addEventListener('change', this.onMotionChange);
+      if (!this.motionEnabled()) {
+        this.skipIntro();
+        return;
+      }
+      this.introTimer = setTimeout(() => this.typeIntroduction(), 520);
+    });
   }
 
   ngOnDestroy(): void {
-    if (this.suggestionRevealTimer) clearTimeout(this.suggestionRevealTimer);
-    if (this.introRevealTimer) clearTimeout(this.introRevealTimer);
+    this.destroyed = true;
+    clearTimeout(this.introTimer);
+    clearTimeout(this.typingTimer);
+    clearTimeout(this.replyTimer);
+    this.finishTyping = undefined;
+    this.motionQuery?.removeEventListener('change', this.onMotionChange);
   }
 
-  ngAfterViewChecked(): void {
-    if (this.shouldScroll && this.chatContainer) {
+  private updateRenderedView(): void {
+    if (this.followLatest && this.chatContainer) {
       const container = this.chatContainer.nativeElement;
       if (typeof container.scrollTo === 'function') {
-        container.scrollTo({ top: container.scrollHeight, behavior: this.scrollBehavior });
-      } else {
-        container.scrollTop = container.scrollHeight;
-      }
-      this.shouldScroll = false;
+        container.scrollTo({
+          top: container.scrollHeight,
+          behavior: this.motionEnabled() && this.typingReplyId() === null ? 'smooth' : 'auto',
+        });
+      } else container.scrollTop = container.scrollHeight;
+    }
+    if (this.focusComposer && this.composerReady() && this.messageInput) {
+      this.messageInput.nativeElement.focus({ preventScroll: true });
+      this.focusComposer = false;
     }
   }
 
-  onMessageChange(value: string): void {
-    this.message.set(value);
-    if (value.trim()) this.dismissSuggestions();
+  onTranscriptScroll(): void {
+    const element = this.chatContainer?.nativeElement;
+    if (element)
+      this.followLatest = element.scrollHeight - element.scrollTop - element.clientHeight < 64;
+  }
+
+  toggleMotion(): void {
+    this.motionPaused.update((paused) => !paused);
+  }
+
+  skipIntro(): void {
+    if (this.composerReady()) return;
+    clearTimeout(this.introTimer);
+    clearTimeout(this.typingTimer);
+    this.finishTyping = undefined;
+    this.introTyped.set(this.introText);
+    this.openComposer();
+  }
+
+  private typeIntroduction(): void {
+    this.introPhase.set('typing');
+    this.typeText(
+      this.introText,
+      (text) => this.introTyped.set(text),
+      () => {
+        this.introPhase.set('receding');
+        this.announcement.set(this.introText);
+        if (!this.motionEnabled()) this.openComposer();
+        else this.introTimer = setTimeout(() => this.openComposer(), 650);
+      },
+      3400,
+    );
+  }
+
+  private openComposer(): void {
+    const activeElement = this.document.activeElement;
+    this.focusComposer =
+      !activeElement ||
+      activeElement === this.document.body ||
+      activeElement.classList.contains('intro-skip');
+    this.introPhase.set('ready');
+    this.announcement.set(this.introText);
+  }
+
+  // The API returns a complete reply; this is its presentation, not network streaming.
+  private typeText(
+    text: string,
+    update: (value: string) => void,
+    done: () => void,
+    duration: number,
+  ): void {
+    clearTimeout(this.typingTimer);
+    const characters = Array.from(text);
+    const started = Date.now();
+    this.finishTyping = () => {
+      clearTimeout(this.typingTimer);
+      this.finishTyping = undefined;
+      update(text);
+      done();
+    };
+    if (!this.motionEnabled() || !characters.length) {
+      this.finishTyping();
+      return;
+    }
+    const tick = () => {
+      if (this.destroyed) return;
+      const count = Math.min(
+        characters.length,
+        Math.floor(((Date.now() - started) / duration) * characters.length),
+      );
+      update(characters.slice(0, count).join(''));
+      if (count >= characters.length) this.finishTyping?.();
+      else this.typingTimer = setTimeout(tick, 24);
+    };
+    tick();
   }
 
   useSuggestion(question: string): void {
-    if (this.loading() || this.reachedLimit()) return;
-    this.dismissSuggestions();
+    if (!this.composerReady() || this.responding()) return;
+    this.messageInput?.nativeElement.focus({ preventScroll: true });
     this.message.set(question);
     this.sendMessage();
   }
 
-  private dismissSuggestions(): void {
-    this.suggestionsDismissed.set(true);
-    this.suggestionsVisible.set(false);
-  }
-
   sendMessage(): void {
+    if (!this.canSend()) return;
+    this.followLatest = true;
     const text = this.message().trim();
-    if (!text || this.loading() || this.reachedLimit()) return;
-    this.error.set('');
     this.history.update((items) => [
       ...items,
       { id: this.nextId++, from: 'user', text, timestamp: new Date() },
     ]);
     this.message.set('');
-    this.loading.set(true);
     void this.askLLM(text);
   }
 
-  async askLLM(message: string): Promise<void> {
+  retryMessage(): void {
+    if (!this.responding() && this.failedMessage()) {
+      this.followLatest = true;
+      void this.askLLM(this.failedMessage());
+    }
+  }
+
+  private async askLLM(message: string): Promise<void> {
+    this.error.set('');
+    this.failedMessage.set('');
+    this.announcement.set('');
+    this.loading.set(true);
+    this.replyArriving.set(false);
+    clearTimeout(this.replyTimer);
     try {
-      this.error.set('');
-      const response = await this.chatservice.sendMessageToAssistant(message);
-      const completedRounds = this.completedRounds() + 1;
-      this.completedRounds.set(completedRounds);
-      const replies: ChatMessage[] = [
+      const response = await this.chatService.sendMessageToAssistant(message);
+      if (this.destroyed) return;
+      const id = this.nextId++;
+      this.typingReplyId.set(id);
+      this.replyVisibleText.set('');
+      this.history.update((items) => [
+        ...items,
         {
-          id: this.nextId++,
+          id,
           from: 'assistant',
           modelName: 'Poppy',
           text: response,
           timestamp: new Date(),
           animate: true,
         },
-      ];
-
-      if (completedRounds >= this.maxRounds) {
-        const queueNumber = Math.floor(Math.random() * 900) + 100;
-        this.coffeeQueueNumber.set(queueNumber);
-        replies.push({
-          id: this.nextId++,
-          from: 'assistant',
-          modelName: 'Poppy',
-          text: `Thank you for your questions. Under Poppy's four-round resource-allocation policy, this inquiry should now be escalated directly to Subhadra at s.subhadhra@gmail.com; there appears to be a productive conversation waiting to happen. If the service met expectations, coffee contributions are also acceptable. You are visitor #${queueNumber} in the queue to authorize my temporary departure from the building for one properly scheduled cup.`, 
-          timestamp: new Date(),
-          animate: true,
-        });
-      }
-
-      this.history.update((items) => [...items, ...replies]);
+      ]);
+      this.replyArriving.set(true);
+      this.typeText(
+        response,
+        (text) => this.replyVisibleText.set(text),
+        () => {
+          this.typingReplyId.set(null);
+          this.announcement.set(response);
+          this.replyTimer = setTimeout(() => this.replyArriving.set(false), 1800);
+        },
+        Math.min(4200, Math.max(700, Array.from(response).length * 12)),
+      );
     } catch {
-      this.error.set('An unscheduled systems audit interrupted the request. Please try again.');
+      if (this.destroyed) return;
+      this.error.set("That reply didn't make it through. Give it another try.");
+      this.failedMessage.set(message);
     } finally {
-      this.loading.set(false);
+      if (!this.destroyed) this.loading.set(false);
     }
   }
 }

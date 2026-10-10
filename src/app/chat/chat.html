@@ -1,150 +1,227 @@
-<div
-  class="hq-shell flex h-dvh w-full items-center justify-center p-2 font-sans text-[#F3EBDD] sm:p-4"
->
-  <div
-    class="hq-panel flex h-full min-h-0 w-full max-w-3xl flex-col overflow-hidden rounded-[2rem] border border-[#9D753F] shadow-2xl sm:h-[min(850px,90dvh)]"
-  >
-    <header class="flex shrink-0 items-center border-b border-[#9D753F] p-4 sm:p-5">
-      <i class="bi bi-chat-dots-fill text-3xl text-[#D69A3A]" aria-hidden="true"></i>
-      <div class="ml-4 min-w-0">
-        <p class="mb-1 text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-[#D69A3A]">
-          Meet Subhadra
-        </p>
-        <h1 class="truncate text-xl font-bold tracking-wide sm:text-2xl">The Virtual Desk</h1>
-        <p class="mt-1 text-sm leading-6 text-[#B8AA96]">
-          A conversational introduction to Subhadra's work, projects, and interests.
+<div class="experience" [class.motion-paused]="!motionEnabled()">
+  <div class="atmosphere" aria-hidden="true">
+    <div class="mist mist-one"></div>
+    <div class="mist mist-two"></div>
+    <div class="grid-plane"></div>
+  </div>
+  <header class="topbar">
+    <div class="brand" aria-label="Poppy, Subhadra's assistant">
+      <span class="brand-symbol" aria-hidden="true">ψ</span>
+      <span>poppy<span class="brand-period">.</span></span>
+      <span class="brand-caption">SUBHADRA'S<br />OWN LITTLE WORLD</span>
+    </div>
+    <div class="topbar-actions">
+      <button
+        class="motion-control"
+        type="button"
+        (click)="toggleMotion()"
+        [disabled]="reducedMotion()"
+        [attr.aria-pressed]="motionEnabled()"
+        [attr.aria-label]="
+          reducedMotion()
+            ? 'Motion reduced by your device settings'
+            : motionEnabled()
+              ? 'Pause ambient motion'
+              : 'Enable ambient motion'
+        "
+        [title]="
+          reducedMotion()
+            ? 'Following your reduced-motion preference'
+            : motionEnabled()
+              ? 'Pause ambient motion'
+              : 'Enable ambient motion'
+        "
+      >
+        <span class="motion-bars" aria-hidden="true"
+          ><span></span><span></span><span></span><span></span
+        ></span>
+        <span class="motion-label">MOTION {{ motionEnabled() ? 'ON' : 'OFF' }}</span>
+      </button>
+      <a class="contact-link" href="mailto:s.subhadhra@gmail.com"
+        >Contact Subhadra <i class="bi bi-arrow-up-right" aria-hidden="true"></i
+      ></a>
+    </div>
+  </header>
+
+  <main class="shared-space" id="main-content" [class.in-conversation]="hasStarted()">
+    <section class="identity" aria-labelledby="identity-title">
+      <div class="identity-copy">
+        <p class="eyebrow"><span class="status-dot"></span> ME, POPPY & YOU</p>
+        <h1 id="identity-title">Subhadra.<br /><em>As I am.</em></h1>
+        <p class="identity-description">
+          The work, the interests, the in-between. My corner of the internet. Come as you are.
         </p>
       </div>
-    </header>
-    <main
-      #chatContainer
-      class="min-h-0 flex-grow overflow-y-auto scroll-smooth p-4 sm:p-6"
-      role="log"
-      aria-live="polite"
-    >
-      <div class="mx-auto flex min-h-full max-w-3xl flex-col space-y-4">
-        @if (history().length === 0 && !loading()) {
-          <div class="flex flex-grow items-center justify-center">
-            <p class="text-center text-[#9D8F7A]">Ask Poppy about Subhadra's work, experience, projects, and interests.</p>
-          </div>
-        }
-        @for (item of history(); track item.id) {
-          <div
-            class="flex flex-col"
-            [class.items-end]="item.from === 'user'"
-            [class.items-start]="item.from === 'assistant'"
+      <div class="presence-stage">
+        <div class="poppy-presence">
+          <app-presence [thinking]="responding() || introPhase() === 'typing'" />
+        </div>
+        <div class="presence-caption">
+          <span class="presence-name">POPPY <span>/ MY AI ASSISTANT</span></span>
+          <span class="presence-status" role="status"
+            ><span class="status-dot" [class.thinking-dot]="loading()"></span>{{ status() }}</span
           >
-            <p
-              class="mb-1 text-xs"
-              [class.me-3]="item.from === 'user'"
-              [class.ms-3]="item.from === 'assistant'"
-              [class.text-[#D69A3A]]="item.from === 'user'"
-              [class.text-[#B8AA96]]="item.from === 'assistant'"
-            >
-              @if (item.from === 'user') {
-                You
-              } @else {
-                {{ item.modelName || 'Poppy' }}
-              }
-            </p>
-            <div
-              class="max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-6 [overflow-wrap:anywhere] sm:max-w-[80%] sm:text-base"
-              [class.rounded-br-none]="item.from === 'user'"
-              [class.rounded-bl-none]="item.from === 'assistant'"
-              [class.bg-[#654A29]]="item.from === 'user'"
-              [class.bg-[#23292D]]="item.from === 'assistant'"
-              [class.poppy-message]="item.from === 'assistant'"
-              [class.poppy-message--pending]="item.from === 'assistant' && item.animate === false"
-              [class.ethereal-arrival]="item.from === 'assistant' && item.animate === true"
-              [class.user-message]="item.from === 'user'"
-              [class.whitespace-pre-wrap]="item.from === 'assistant'"
-            >
-              {{ item.text }}
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="conversation glass-panel"
+      aria-label="You and Poppy"
+      [attr.data-intro-phase]="introPhase()"
+      [class.composer-ready]="composerReady()"
+    >
+      @if (!composerReady()) {
+        <button type="button" class="intro-skip" (click)="skipIntro()">
+          Skip introduction <i class="bi bi-arrow-right" aria-hidden="true"></i>
+        </button>
+      }
+      <span class="sr-only" role="status" aria-live="polite" aria-atomic="true">{{
+        announcement()
+      }}</span>
+      <div
+        #chatContainer
+        class="transcript"
+        role="log"
+        aria-label="Conversation with Poppy"
+        aria-live="off"
+        aria-relevant="additions"
+        tabindex="0"
+        (scroll)="onTranscriptScroll()"
+      >
+        <article
+          class="first-thought"
+          [class.first-thought--receded]="introPhase() === 'receding' || composerReady()"
+          [class.first-thought--past]="hasStarted()"
+        >
+          <p class="message-meta">
+            <span class="message-author">POPPY</span><span class="ai-label">AI ASSISTANT</span>
+          </p>
+          <p class="first-hello typing-layer">
+            <span class="type-reserve" aria-hidden="true">{{ introTitle }}</span>
+            <span class="typed-copy" aria-hidden="true"
+              >{{ introTitleVisible()
+              }}<span
+                class="typing-caret"
+                [class.caret-visible]="
+                  introPhase() === 'typing' && introTyped().length <= introTitle.length
+                "
+              ></span
+            ></span>
+            <span class="sr-only">{{ introTitle }}</span>
+          </p>
+          <p class="intro-body typing-layer">
+            <span class="type-reserve" aria-hidden="true">{{ introBody }}</span>
+            <span class="typed-copy" aria-hidden="true"
+              >{{ introBodyVisible()
+              }}<span
+                class="typing-caret"
+                [class.caret-visible]="
+                  introPhase() === 'typing' && introTyped().length > introTitle.length
+                "
+              ></span
+            ></span>
+            <span class="sr-only">{{ introBody }}</span>
+          </p>
+          <span class="first-thread" aria-hidden="true"></span>
+        </article>
+        @for (item of history(); track item.id) {
+          <article
+            class="message"
+            [class.user-message]="item.from === 'user'"
+            [class.assistant-message]="item.from === 'assistant'"
+          >
+            <div class="message-meta">
+              <span class="message-author">{{ item.from === 'user' ? 'YOU' : 'POPPY' }}</span
+              ><span class="ai-label" [hidden]="item.from === 'user'">AI ASSISTANT</span
+              ><time [attr.datetime]="item.timestamp.toISOString()">{{
+                item.timestamp | date: 'shortTime'
+              }}</time>
             </div>
-          </div>
+            <div class="message-body">
+              <span class="sr-only">{{ item.text }}</span
+              ><span aria-hidden="true"
+                >{{ typingReplyId() === item.id ? replyVisibleText() : item.text
+                }}<span
+                  class="typing-caret"
+                  [class.caret-visible]="typingReplyId() === item.id"
+                ></span
+              ></span>
+            </div>
+          </article>
         }
         @if (loading()) {
-          <div class="flex items-end justify-start">
-            <div class="rounded-2xl rounded-bl-none bg-[#23292D] px-4 py-3">
-              <p class="mb-2 animate-pulse text-sm text-[#F3EBDD]">
-                Poppy is reviewing the approved documentation...
-              </p>
-              <div class="flex items-center gap-2">
-                <span class="h-2 w-2 animate-pulse rounded-full bg-teal-400"></span
-                ><span
-                  class="h-2 w-2 animate-pulse rounded-full bg-teal-400 [animation-delay:200ms]"
-                ></span
-                ><span
-                  class="h-2 w-2 animate-pulse rounded-full bg-teal-400 [animation-delay:400ms]"
-                ></span>
-              </div>
-              <div class="mt-3 space-y-2">
-                <div class="h-2 w-24 animate-pulse rounded bg-[#4A4540]"></div>
-                <div class="h-2 w-32 animate-pulse rounded bg-[#4A4540]"></div>
-              </div>
-            </div>
+          <div class="thinking-message" role="status">
+            <span class="thinking-dots" aria-hidden="true"
+              ><span></span><span></span><span></span></span
+            >Let me follow that thread…
           </div>
         }
       </div>
-    </main>
-    <footer class="shrink-0 border-t border-[#9D753F] p-3 sm:p-4">
       <div
-        class="suggestions mx-auto flex w-full max-w-3xl flex-wrap gap-2"
-        [class.suggestions--hidden]="suggestionsCloaked()"
-        aria-label="Suggested questions"
-        [attr.aria-hidden]="suggestionsCloaked()"
-        [attr.inert]="suggestionsCloaked() ? '' : null"
+        class="composer-reveal"
+        [attr.inert]="composerReady() ? null : ''"
+        [attr.aria-hidden]="!composerReady()"
       >
-        @for (question of suggestedQuestions; track question) {
-          <button
-            type="button"
-            (click)="useSuggestion(question)"
-            [disabled]="loading() || reachedLimit()"
-            class="rounded-full border border-[#D69A3A]/60 bg-[#F3EBDD]/10 px-3 py-2 text-left text-xs leading-4 text-[#F3EBDD] transition-colors duration-150 hover:border-[#D69A3A] hover:bg-[#D69A3A]/20 disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm"
-          >
-            {{ question }}
-          </button>
-        }
+        <div class="composer-reveal-inner">
+          <div class="composer-area">
+            <div class="starter-pills" aria-label="Ask Poppy about Subhadra">
+              @for (topic of topics; track topic.number) {
+                <button
+                  type="button"
+                  (click)="useSuggestion(topic.question)"
+                  [disabled]="responding() || !composerReady()"
+                >
+                  {{ topic.title }} <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
+                </button>
+              }
+            </div>
+            @if (error()) {
+              <div class="request-error" role="alert">
+                <span>{{ error() }}</span
+                ><button type="button" (click)="retryMessage()" [disabled]="responding()">
+                  Retry <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+                </button>
+              </div>
+            }
+            <form class="composer" (ngSubmit)="sendMessage()" [attr.aria-busy]="responding()">
+              <span class="composer-prompt" aria-hidden="true">↗</span>
+              <label for="chat-message" class="sr-only">Your message to Poppy</label>
+              <div class="input-line" [class.is-empty]="!message()">
+                <input
+                  #messageInput
+                  id="chat-message"
+                  name="message"
+                  type="text"
+                  autocomplete="off"
+                  [attr.tabindex]="composerReady() ? 0 : -1"
+                  [ngModel]="message()"
+                  (ngModelChange)="message.set($event)"
+                  placeholder="Say what's on your mind…"
+                /><span class="waiting-caret" aria-hidden="true"></span>
+              </div>
+              <button
+                type="submit"
+                class="send-button"
+                [disabled]="!canSend()"
+                aria-label="Send message"
+              >
+                <i class="bi bi-arrow-up" aria-hidden="true"></i>
+              </button>
+            </form>
+            <div class="composer-footnote">
+              <span>Poppy is an AI assistant. Responses can be imperfect.</span
+              ><span class="enter-hint">ENTER <span>↵</span></span>
+            </div>
+          </div>
+        </div>
       </div>
-      <form
-        (ngSubmit)="sendMessage()"
-        class="mx-auto w-full max-w-3xl"
-        [attr.aria-busy]="loading()"
-      >
-        <fieldset
-          class="flex min-w-0 items-center gap-3 disabled:opacity-60"
-          [disabled]="loading() || reachedLimit()"
-        >
-          <legend class="sr-only">Send a message</legend>
-          <input
-            type="text"
-            name="message"
-            [ngModel]="message()"
-            (ngModelChange)="onMessageChange($event)"
-            [disabled]="loading() || reachedLimit()"
-            [placeholder]="reachedLimit() ? 'Poppy has redirected this conversation to email.' : 'Type your message...'"
-            class="min-w-0 flex-1 rounded-full bg-[#23292D] px-4 py-3 text-base outline-none focus:ring-2 focus:ring-[#D69A3A] disabled:opacity-50 sm:px-5"
-            aria-label="Message"
-          /><button
-            type="submit"
-            [disabled]="!canSend()"
-            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#654A29] text-[#F3EBDD] transition hover:bg-[#B88438] focus:outline-none focus:ring-2 focus:ring-[#D69A3A] focus:ring-offset-2 focus:ring-offset-[#141719] disabled:cursor-not-allowed disabled:opacity-50"
-            aria-label="Send message"
-          >
-            <i class="bi bi-send-fill" aria-hidden="true"></i>
-          </button>
-        </fieldset>
-      </form>
-      @if (reachedLimit()) {
-        <p class="mt-3 text-center text-sm leading-6 text-[#B8AA96]">
-          A good conversation may be waiting&mdash;reach Subhadra directly at
-          <a class="font-semibold text-[#D69A3A] underline decoration-[#D69A3A]/50 underline-offset-4 hover:text-[#F3EBDD]" href="mailto:s.subhadhra@gmail.com">s.subhadhra@gmail.com</a>.
-          You are visitor #{{ coffeeQueueNumber() }} in Poppy's coffee queue.
-        </p>
-      }
-      @if (error()) {
-        <p role="alert" class="mt-2 text-center text-sm text-[#D99574]">{{ error() }}</p>
-      }
-    </footer>
-  </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <span
+      >SUBHADRA <span class="footer-slash">/</span> POPPY
+      <span class="footer-slash">/</span> YOU</span
+    ><span>LET THE CONVERSATION <span class="footer-accent">GO SOMEWHERE.</span></span>
+  </footer>
 </div>
