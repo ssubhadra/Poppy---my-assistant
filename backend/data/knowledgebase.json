@@ -1,0 +1,159 @@
+{
+    "questions":  [
+                      {
+                          "question":  "Who is Subhadra Srivatsan and what value does she bring?",
+                          "aliases":  [
+                                          "who am I",
+                                          "tell me about Subhadra",
+                                          "who is Subhadra",
+                                          "introduce Subhadra",
+                                          "what does Subhadra do",
+                                          "tell me about yourself"
+                                      ],
+                          "answer":  "Subhadra Srivatsan is a Boston-based Product Owner with a background spanning enterprise SaaS, business analytics, AI-assisted search, product discovery, and technical delivery. She is strongest at turning customer needs and complex workflows into clear requirements, measurable product decisions, and practical releases. Her experience combines product judgment, analytics, cross-functional collaboration, and enough technical depth to work effectively with engineering teams. She may be a useful candidate for teams seeking a thoughtful product professional who can connect customer value, data, and delivery, and she would welcome the opportunity to demonstrate that fit."
+                      },
+                      {
+                          "question":  "What is Subhadra\u0027s current role?",
+                          "aliases":  [
+                                          "current job",
+                                          "current position",
+                                          "what is she doing now",
+                                          "where does Subhadra work"
+                                      ],
+                          "answer":  "Subhadra is a Product Owner at Engageware, working on Scheduler for Salesforce, an enterprise SaaS product. Her work includes product discovery, PRDs, epics, user stories, roadmap prioritization, release planning, workflow validation, accessibility testing, and collaboration with Engineering, UX, Support, and Solution Architects."
+                      },
+                      {
+                          "question":  "What professional experience does Subhadra have?",
+                          "aliases":  [
+                                          "work history",
+                                          "career history",
+                                          "previous roles",
+                                          "experience"
+                                      ],
+                          "answer":  "Subhadra\u0027s experience includes Product Owner and Technical Business Analyst roles at Engageware, a Marketing Analyst role at the University of Massachusetts Boston, and a Quality Services Associate and Tester role at Amazon. Her work has covered enterprise SaaS, Salesforce scheduling, knowledge management for financial institutions, GenAI search, analytics, product operations, marketing analytics, and software quality."
+                      },
+                      {
+                          "question":  "What are Subhadra\u0027s product management skills?",
+                          "aliases":  [
+                                          "product skills",
+                                          "product owner skills",
+                                          "product management experience"
+                                      ],
+                          "answer":  "Her product management skills include product discovery, product strategy, PRDs, requirements gathering, customer-value definition, backlog management, release readiness, rollout planning, stakeholder communication, Jira, Confluence, and Agile and Scrum ceremonies."
+                      },
+                      {
+                          "question":  "What analytics and technical skills does Subhadra have?",
+                          "aliases":  [
+                                          "technical skills",
+                                          "analytics skills",
+                                          "tools",
+                                          "technology experience"
+                                      ],
+                          "answer":  "Subhadra works with product and AI adoption metrics, KPI reporting, SQL, Power BI, Tableau, Snowflake, Python, Advanced Excel, REST APIs, Swagger documentation, React, Vite, TypeScript, GitHub, Vercel, Salesforce Lightning Flows, reports, formula fields, and custom objects."
+                      },
+                      {
+                          "question":  "What AI and search experience does Subhadra have?",
+                          "aliases":  [
+                                          "AI experience",
+                                          "GenAI experience",
+                                          "search experience",
+                                          "OpenAI experience",
+                                          "LLM experience"
+                                      ],
+                          "answer":  "Her AI and search experience includes contextual and AI search, OpenAI API concepts, LangChain, prompt caching, small-model routing, search-quality analysis, explanation design, token-cost management, token optimization, AI adoption planning, and data-freshness monitoring. She has translated these concepts into business requirements and supported analysis of adoption, quality, usage, and cost."
+                      },
+                      {
+                          "question":  "What measurable outcomes has Subhadra contributed to?",
+                          "aliases":  [
+                                          "achievements",
+                                          "impact",
+                                          "results",
+                                          "accomplishments"
+                                      ],
+                          "answer":  "Her resume reports contributions to protecting more than $500K in at-risk ARR, supporting 100% renewals and zero churn for a Scheduler customer base, helping land early adopters through three-year contracts worth up to $50K in expansion revenue per account, improving on-time SLA resolution from 68% to 73%, increasing campaign participation by 25%, and helping reduce post-release bugs by 40%."
+                      },
+                      {
+                          "question":  "What is Subhadra\u0027s education?",
+                          "aliases":  [
+                                          "education",
+                                          "degree",
+                                          "university",
+                                          "academic background"
+                                      ],
+                          "answer":  "Subhadra earned a Master of Science in Business Analytics from the University of Massachusetts Boston in May 2023 and a Bachelor of Engineering in Computer Science Engineering from MNM Jain Engineering College in May 2019."
+                      },
+                      {
+                          "question":  "What certifications does Subhadra have?",
+                          "aliases":  [
+                                          "certifications",
+                                          "certificates",
+                                          "professional certification"
+                                      ],
+                          "answer":  "Subhadra is a Salesforce Certified Business Analyst and a Certified Scrum Product Owner (CSPO)."
+                      },
+                      {
+                          "question":  "What projects has Subhadra built?",
+                          "aliases":  [
+                                          "projects",
+                                          "portfolio projects",
+                                          "cash flow project",
+                                          "underwriting project"
+                                      ],
+                          "answer":  "Subhadra built an AI-enabled SMB cash-flow underwriting MVP that turns transaction data into lender-facing risk signals, API responses, dashboards, reports, and plain-English explanations for analyst review. The work covered discovery, requirements, metric design, API behavior, UX flows, risk-scoring logic, and AI-assisted explanation design using tools including OpenAI API, LangChain, React, Vite, Figma, Framer, Vercel, and REST APIs."
+                      },
+                      {
+                          "question":  "How can someone contact Subhadra?",
+                          "aliases":  [
+                                          "contact",
+                                          "email",
+                                          "LinkedIn",
+                                          "reach Subhadra"
+                                      ],
+                          "answer":  "Subhadra can be reached at s.subhadhra@gmail.com or through LinkedIn at https://www.linkedin.com/in/subhadra-srivatsan/."
+                      },
+                      {
+                          "question":  "Who is Subhadra outside of work?",
+                          "aliases":  [
+                                          "who is Subhadra beyond her resume",
+                                          "what is Subhadra like personally",
+                                          "tell me something personal about Subhadra",
+                                          "Subhadra outside work",
+                                          "personality and interests"
+                                      ],
+                          "answer":  "Outside work, Subhadra enjoys knitting, embroidery, fiction, anime, wide-ranging music, sitcoms, and collecting visual inspiration with strong Pinterest mood-board energy. She prefers spending less time on Instagram so she can dream, create, explore interests, and enjoy life more directly. She describes herself as mostly millennial with perhaps five percent Gen Z energy, and she is working on being more consistent at the gym despite feeling unexpectedly shy there."
+                      },
+                      {
+                          "question":  "What does Subhadra enjoy reading and watching?",
+                          "aliases":  [
+                                          "books and anime",
+                                          "what does she read",
+                                          "favorite anime",
+                                          "current books",
+                                          "shows Subhadra likes",
+                                          "sitcoms"
+                                      ],
+                          "answer":  "Subhadra is an avid fiction reader currently reading Player Piano and Dungeon Crawler Carl. Her anime viewing includes Naruto, One-Punch Man, My Hero Academia, Frieren, Solo Leveling, and more. She also enjoys sitcoms including Mom, Malcolm in the Middle, The Middle, Kim\u0027s Convenience, Community, Modern Family, Friends, and Two and a Half Men, with room for the occasional Rick and Morty reference."
+                      },
+                      {
+                          "question":  "What music and creative hobbies does Subhadra enjoy?",
+                          "aliases":  [
+                                          "music taste",
+                                          "Spotify playlist",
+                                          "creative hobbies",
+                                          "arts and crafts",
+                                          "knitting and embroidery",
+                                          "favorite composers"
+                                      ],
+                          "answer":  "Subhadra enjoys knitting and embroidery and maintains an approximately 800-song Spotify playlist spanning melodic music, EDM, indie pop, country, and rock. Her listening includes Evanescence and composers and instrumental artists such as Steve Jablonsky, Hans Zimmer, Gibran Alcocer, and Joel Sunny."
+                      },
+                      {
+                          "question":  "What unusual word does Subhadra know?",
+                          "aliases":  [
+                                          "obsequious",
+                                          "use obsequious in a sentence",
+                                          "interesting vocabulary"
+                                      ],
+                          "answer":  "Subhadra knows that obsequious describes someone who is excessively eager to please or obey. Example: The obsequious aide agreed with every proposal before the quarterly risk review had even begun."
+                      }
+                  ]
+}
