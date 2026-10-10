@@ -1,4 +1,4 @@
 export const environment = {
-    production: false,
+    production: true,
     apiUrl: 'https://poppy-my-assistant.onrender.com', // Update this to your backend API URL
 };
