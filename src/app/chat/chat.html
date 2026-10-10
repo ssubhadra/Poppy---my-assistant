@@ -1,1 +1,150 @@
-<h1 class="text-3xl font-bold underline"> Hello world!</h1>
+<div
+  class="hq-shell flex h-dvh w-full items-center justify-center p-2 font-sans text-[#F3EBDD] sm:p-4"
+>
+  <div
+    class="hq-panel flex h-full min-h-0 w-full max-w-3xl flex-col overflow-hidden rounded-[2rem] border border-[#9D753F] shadow-2xl sm:h-[min(850px,90dvh)]"
+  >
+    <header class="flex shrink-0 items-center border-b border-[#9D753F] p-4 sm:p-5">
+      <i class="bi bi-chat-dots-fill text-3xl text-[#D69A3A]" aria-hidden="true"></i>
+      <div class="ml-4 min-w-0">
+        <p class="mb-1 text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-[#D69A3A]">
+          Meet Subhadra
+        </p>
+        <h1 class="truncate text-xl font-bold tracking-wide sm:text-2xl">The Virtual Desk</h1>
+        <p class="mt-1 text-sm leading-6 text-[#B8AA96]">
+          A conversational introduction to Subhadra's work, projects, and interests.
+        </p>
+      </div>
+    </header>
+    <main
+      #chatContainer
+      class="min-h-0 flex-grow overflow-y-auto scroll-smooth p-4 sm:p-6"
+      role="log"
+      aria-live="polite"
+    >
+      <div class="mx-auto flex min-h-full max-w-3xl flex-col space-y-4">
+        @if (history().length === 0 && !loading()) {
+          <div class="flex flex-grow items-center justify-center">
+            <p class="text-center text-[#9D8F7A]">Ask Poppy about Subhadra's work, experience, projects, and interests.</p>
+          </div>
+        }
+        @for (item of history(); track item.id) {
+          <div
+            class="flex flex-col"
+            [class.items-end]="item.from === 'user'"
+            [class.items-start]="item.from === 'assistant'"
+          >
+            <p
+              class="mb-1 text-xs"
+              [class.me-3]="item.from === 'user'"
+              [class.ms-3]="item.from === 'assistant'"
+              [class.text-[#D69A3A]]="item.from === 'user'"
+              [class.text-[#B8AA96]]="item.from === 'assistant'"
+            >
+              @if (item.from === 'user') {
+                You
+              } @else {
+                {{ item.modelName || 'Poppy' }}
+              }
+            </p>
+            <div
+              class="max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-6 [overflow-wrap:anywhere] sm:max-w-[80%] sm:text-base"
+              [class.rounded-br-none]="item.from === 'user'"
+              [class.rounded-bl-none]="item.from === 'assistant'"
+              [class.bg-[#654A29]]="item.from === 'user'"
+              [class.bg-[#23292D]]="item.from === 'assistant'"
+              [class.poppy-message]="item.from === 'assistant'"
+              [class.poppy-message--pending]="item.from === 'assistant' && item.animate === false"
+              [class.ethereal-arrival]="item.from === 'assistant' && item.animate === true"
+              [class.user-message]="item.from === 'user'"
+              [class.whitespace-pre-wrap]="item.from === 'assistant'"
+            >
+              {{ item.text }}
+            </div>
+          </div>
+        }
+        @if (loading()) {
+          <div class="flex items-end justify-start">
+            <div class="rounded-2xl rounded-bl-none bg-[#23292D] px-4 py-3">
+              <p class="mb-2 animate-pulse text-sm text-[#F3EBDD]">
+                Poppy is reviewing the approved documentation...
+              </p>
+              <div class="flex items-center gap-2">
+                <span class="h-2 w-2 animate-pulse rounded-full bg-teal-400"></span
+                ><span
+                  class="h-2 w-2 animate-pulse rounded-full bg-teal-400 [animation-delay:200ms]"
+                ></span
+                ><span
+                  class="h-2 w-2 animate-pulse rounded-full bg-teal-400 [animation-delay:400ms]"
+                ></span>
+              </div>
+              <div class="mt-3 space-y-2">
+                <div class="h-2 w-24 animate-pulse rounded bg-[#4A4540]"></div>
+                <div class="h-2 w-32 animate-pulse rounded bg-[#4A4540]"></div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </main>
+    <footer class="shrink-0 border-t border-[#9D753F] p-3 sm:p-4">
+      <div
+        class="suggestions mx-auto flex w-full max-w-3xl flex-wrap gap-2"
+        [class.suggestions--hidden]="suggestionsCloaked()"
+        aria-label="Suggested questions"
+        [attr.aria-hidden]="suggestionsCloaked()"
+        [attr.inert]="suggestionsCloaked() ? '' : null"
+      >
+        @for (question of suggestedQuestions; track question) {
+          <button
+            type="button"
+            (click)="useSuggestion(question)"
+            [disabled]="loading() || reachedLimit()"
+            class="rounded-full border border-[#D69A3A]/60 bg-[#F3EBDD]/10 px-3 py-2 text-left text-xs leading-4 text-[#F3EBDD] transition-colors duration-150 hover:border-[#D69A3A] hover:bg-[#D69A3A]/20 disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm"
+          >
+            {{ question }}
+          </button>
+        }
+      </div>
+      <form
+        (ngSubmit)="sendMessage()"
+        class="mx-auto w-full max-w-3xl"
+        [attr.aria-busy]="loading()"
+      >
+        <fieldset
+          class="flex min-w-0 items-center gap-3 disabled:opacity-60"
+          [disabled]="loading() || reachedLimit()"
+        >
+          <legend class="sr-only">Send a message</legend>
+          <input
+            type="text"
+            name="message"
+            [ngModel]="message()"
+            (ngModelChange)="onMessageChange($event)"
+            [disabled]="loading() || reachedLimit()"
+            [placeholder]="reachedLimit() ? 'Poppy has redirected this conversation to email.' : 'Type your message...'"
+            class="min-w-0 flex-1 rounded-full bg-[#23292D] px-4 py-3 text-base outline-none focus:ring-2 focus:ring-[#D69A3A] disabled:opacity-50 sm:px-5"
+            aria-label="Message"
+          /><button
+            type="submit"
+            [disabled]="!canSend()"
+            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#654A29] text-[#F3EBDD] transition hover:bg-[#B88438] focus:outline-none focus:ring-2 focus:ring-[#D69A3A] focus:ring-offset-2 focus:ring-offset-[#141719] disabled:cursor-not-allowed disabled:opacity-50"
+            aria-label="Send message"
+          >
+            <i class="bi bi-send-fill" aria-hidden="true"></i>
+          </button>
+        </fieldset>
+      </form>
+      @if (reachedLimit()) {
+        <p class="mt-3 text-center text-sm leading-6 text-[#B8AA96]">
+          A good conversation may be waiting&mdash;reach Subhadra directly at
+          <a class="font-semibold text-[#D69A3A] underline decoration-[#D69A3A]/50 underline-offset-4 hover:text-[#F3EBDD]" href="mailto:s.subhadhra@gmail.com">s.subhadhra@gmail.com</a>.
+          You are visitor #{{ coffeeQueueNumber() }} in Poppy's coffee queue.
+        </p>
+      }
+      @if (error()) {
+        <p role="alert" class="mt-2 text-center text-sm text-[#D99574]">{{ error() }}</p>
+      }
+    </footer>
+  </div>
+</div>

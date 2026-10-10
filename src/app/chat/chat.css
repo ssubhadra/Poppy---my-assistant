@@ -1,0 +1,205 @@
+:host {
+  display: block;
+  color-scheme: dark;
+  --ivory: #f3ebdd;
+  --cream: #f3ebdd;
+  --camel: #d69a3a;
+  --taupe: #b8aa96;
+  --chocolate: #23292d;
+  --navy: #141719;
+  --black: #08090a;
+  --olive: #654a29;
+  --white: #f3ebdd;
+}
+
+.hq-shell {
+  position: relative;
+  isolation: isolate;
+  background-color: #080a0b;
+  background-image:
+    linear-gradient(90deg, rgba(5, 8, 10, 0.74), rgba(5, 8, 10, 0.3)),
+    url('/nyc-villains-hq.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.hq-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 78% 68%, rgba(196, 154, 99, 0.12), transparent 35rem),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.34));
+}
+
+.hq-panel {
+  position: relative;
+  background: rgba(16, 27, 35, 0.9);
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.58),
+    0 0 0 1px rgba(196, 154, 99, 0.12) inset;
+  backdrop-filter: blur(18px) saturate(115%);
+  -webkit-backdrop-filter: blur(18px) saturate(115%);
+}
+
+header {
+  background: linear-gradient(135deg, rgba(58, 43, 31, 0.78), rgba(23, 35, 45, 0.88));
+}
+
+input {
+  color: var(--ivory);
+  border: 1px solid rgba(196, 154, 99, 0.38);
+}
+
+input::placeholder {
+  color: var(--taupe);
+}
+
+button {
+  box-shadow: 0 8px 24px rgba(21, 22, 16, 0.28);
+}
+
+fieldset:disabled {
+  opacity: 0.55;
+}
+
+.suggestions {
+  max-height: 10rem;
+  margin-bottom: 0.75rem;
+  opacity: 1;
+  overflow: hidden;
+  filter: blur(0);
+  transform: translateY(0) scale(1);
+  transform-origin: center bottom;
+  transition:
+    opacity 500ms ease,
+    filter 500ms ease,
+    transform 500ms ease,
+    max-height 500ms ease,
+    margin-bottom 500ms ease;
+}
+
+.suggestions--hidden {
+  max-height: 0;
+  margin-bottom: 0;
+  opacity: 0;
+  filter: blur(10px);
+  pointer-events: none;
+  transform: translateY(10px) scale(0.96);
+}
+
+@media (max-width: 639px) {
+  .hq-shell {
+    background-position: 68% center;
+  }
+
+  .hq-panel {
+    background: rgba(16, 27, 35, 0.94);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .suggestions {
+    transition-duration: 1ms;
+  }
+}
+
+.poppy-message {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid rgba(157, 117, 63, 0.38);
+  border-left: 3px solid var(--camel);
+  border-radius: 0.25rem 1rem 1rem 0.25rem !important;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(214, 154, 58, 0.1), transparent 40%),
+    linear-gradient(110deg, rgba(214, 154, 58, 0.08), transparent 42%),
+    #23292d !important;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
+}
+
+.poppy-message::before {
+  content: '';
+  position: absolute;
+  top: -0.3rem;
+  left: -0.35rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--camel);
+  box-shadow: 0 0 14px rgba(214, 154, 58, 0.8);
+}
+
+
+@keyframes ethereal-ink-arrival {
+  0% {
+    opacity: 0;
+    filter: blur(12px) brightness(1.35);
+    transform: translateY(10px) scale(0.975);
+    text-shadow: 0 0 20px rgba(243, 235, 221, 0.72);
+    box-shadow: 0 0 0 rgba(214, 154, 58, 0);
+  }
+  38% {
+    opacity: 0.58;
+    filter: blur(5px) brightness(1.22);
+    transform: translateY(5px) scale(0.987);
+    text-shadow: 0 0 14px rgba(214, 154, 58, 0.55);
+    box-shadow: 0 10px 32px rgba(214, 154, 58, 0.1);
+  }
+  72% {
+    opacity: 0.92;
+    filter: blur(1px) brightness(1.08);
+    transform: translateY(1px) scale(0.998);
+    text-shadow: 0 0 6px rgba(214, 154, 58, 0.28);
+    box-shadow: 0 14px 34px rgba(214, 154, 58, 0.08);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0) brightness(1);
+    transform: translateY(0) scale(1);
+    text-shadow: none;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
+  }
+}
+
+
+.user-message {
+  border: 1px solid rgba(214, 154, 58, 0.3);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+header {
+  position: relative;
+  overflow: hidden;
+}
+
+header::after {
+  content: '';
+  position: absolute;
+  right: -3rem;
+  bottom: -4rem;
+  width: 11rem;
+  height: 11rem;
+  border: 1px solid rgba(214, 154, 58, 0.17);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 1.7rem rgba(214, 154, 58, 0.035),
+    0 0 0 3.4rem rgba(214, 154, 58, 0.025);
+  pointer-events: none;
+}
+.poppy-message--pending {
+  opacity: 0;
+}
+
+.ethereal-arrival {
+  animation: ethereal-ink-arrival 1100ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ethereal-arrival {
+    animation-duration: 1ms;
+  }
+}

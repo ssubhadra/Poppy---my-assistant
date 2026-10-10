@@ -12,6 +12,19 @@ const browserDistFolder = join(import.meta.dirname, '../browser');
 const app = express();
 const angularApp = new AngularNodeAppEngine();
 
+app.use(express.json());
+
+app.post('/api/chat', (req, res) => {
+  const message = typeof req.body?.message === 'string' ? req.body.message.trim() : '';
+  if (!message) {
+    res.status(400).json({ error: 'Message is required.' });
+    return;
+  }
+  setTimeout(() => {
+    res.json({ reply: 'I received your request: ' + message });
+  }, 1400);
+});
+
 /**
  * Example Express Rest API endpoints can be defined here.
  * Uncomment and define endpoints as necessary.
